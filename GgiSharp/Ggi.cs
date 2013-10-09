@@ -34,7 +34,7 @@ namespace AntMicro.GgiSharp
     public class Ggi : IDisposable
     {
         public static int ContextCounter { get; set; }
-        public static bool GgiInitilized { get; set; }
+        public static bool GgiInitialized { get; set; }
 
         public IntPtr Vis { get; private set; }
         public IntPtr MemVis { get; set; }
@@ -65,10 +65,10 @@ namespace AntMicro.GgiSharp
             ActiveMode = mode;
 
             ContextCounter++;
-            if(!GgiInitilized)
+            if(!GgiInitialized)
             {
                 GgiInit();
-                GgiInitilized = true;
+                GgiInitialized = true;
             }
 
             Vis = GgiOpen("display-x", IntPtr.Zero);
@@ -209,10 +209,10 @@ namespace AntMicro.GgiSharp
                     GgiClose(MemVis);
                     GgiClose(Vis);
                     ContextCounter--;
-                    if(GgiInitilized && ContextCounter == 0)
+                    if(GgiInitialized && ContextCounter == 0)
                     {
                         GgiExit();
-                        GgiInitilized = false;
+                        GgiInitialized = false;
                     }
 
                     GC.SuppressFinalize(this);
