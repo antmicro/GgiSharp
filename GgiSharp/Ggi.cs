@@ -35,6 +35,7 @@ namespace AntMicro.GgiSharp
     {
         public static int ContextCounter { get; set; }
         public static bool GgiInitialized { get; set; }
+        private static readonly object counterLock = new object();
 
         public IntPtr Vis { get; private set; }
         public IntPtr MemVis { get; set; }
@@ -64,11 +65,14 @@ namespace AntMicro.GgiSharp
             SizeY = y;
             ActiveMode = mode;
 
-            ContextCounter++;
-            if(!GgiInitialized)
+            lock (counterLock)
             {
-                GgiInit();
-                GgiInitialized = true;
+                ContextCounter++;
+                if(!GgiInitialized)
+                {
+                    GgiInit();
+                    GgiInitialized = true;
+                }
             }
 
             Vis = GgiOpen("display-x", IntPtr.Zero);
@@ -83,7 +87,7 @@ namespace AntMicro.GgiSharp
                 GgiPanic("Couldn't open memory visual!\n");
             }
 
-            IntPtr sugMode = Marshal.AllocCoTaskMem(Define.SIZEOF_GGI_MODE);
+            IntPtr sugMode = Marshal.AllocHGlobal(Define.SIZEOF_GGI_MODE);
             if(mode == Define.MODE_8BIT)
             {
                 GgiCheckGraphMode(MemVis, x, y, Define.GGI_AUTO, Define.GGI_AUTO, Define.GT_8BIT, sugMode);
@@ -104,11 +108,12 @@ namespace AntMicro.GgiSharp
                 GgiPanic("error setting mode!\n");
             }
 
-            Marshal.FreeCoTaskMem(sugMode);
+            Marshal.FreeHGlobal(sugMode);
         }
 
         ~Ggi()
         {
+            Marshal.FreeHGlobal(emptyTimeVal);
             Dispose();
         }
 
@@ -195,7 +200,7 @@ namespace AntMicro.GgiSharp
         }
 
         private readonly List<Event> eventList = new List<Event>();
-        private readonly IntPtr emptyTimeVal = Marshal.AllocCoTaskMem(Define.SIZEOF_TIMEVAL);
+        private readonly IntPtr emptyTimeVal = Marshal.AllocHGlobal(Define.SIZEOF_TIMEVAL);
         private readonly byte[] emptyByteTable = Enumerable.Repeat((byte)0, Define.SIZEOF_TIMEVAL).ToArray();
 
         private readonly object disposedLock = new object();
@@ -208,11 +213,15 @@ namespace AntMicro.GgiSharp
                 {
                     GgiClose(MemVis);
                     GgiClose(Vis);
-                    ContextCounter--;
-                    if(GgiInitialized && ContextCounter == 0)
+
+                    lock (counterLock)
                     {
-                        GgiExit();
-                        GgiInitialized = false;
+                        ContextCounter--;
+                        if(GgiInitialized && ContextCounter == 0)
+                        {
+                            GgiExit();
+                            GgiInitialized = false;
+                        }
                     }
 
                     GC.SuppressFinalize(this);
