@@ -96,6 +96,10 @@ namespace AntMicro.GgiSharp
             {
                 GgiCheckGraphMode(MemVis, x, y, Define.GGI_AUTO, Define.GGI_AUTO, Define.GT_16BIT, sugMode);
             }
+            else if(mode == Define.MODE_24BIT)
+            {
+                GgiCheckGraphMode(MemVis, x, y, Define.GGI_AUTO, Define.GGI_AUTO, Define.GT_24BIT, sugMode);
+            }
             else if(mode == Define.MODE_32BIT)
             {
                 GgiCheckGraphMode(MemVis, x, y, Define.GGI_AUTO, Define.GGI_AUTO, Define.GT_32BIT, sugMode);

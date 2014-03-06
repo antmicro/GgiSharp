@@ -29,11 +29,13 @@ namespace AntMicro.GgiSharp
 	{
 		public static readonly int MODE_8BIT 	= 0x1;
 		public static readonly int MODE_16BIT 	= 0x2;
+        public static readonly int MODE_24BIT   = 0x3;
 		public static readonly int MODE_32BIT 	= 0x4;
 
 		public static readonly int GGI_AUTO = 0;
 		public static readonly int GT_8BIT	= 67110920;
 		public static readonly int GT_16BIT	= 33558544;
+        public static readonly int GT_24BIT = 33560600;
         public static readonly int GT_32BIT	= 33562648;
 
 		public static readonly int TYPE_MOUSEDOWN 			= 0x001;
